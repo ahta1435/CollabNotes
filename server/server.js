@@ -1,0 +1,58 @@
+const http = require("http");
+const app = require('./App');
+const NoteBook = require('./Schemas/notesSchema');
+//port at which the project shld run
+const port = process.env.port || 8000;
+
+const server = http.createServer(app);
+
+const io = require('socket.io')(server,{
+    cors : {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"],
+    }
+});
+
+server.listen(port, () => {
+    const address = server.address();
+    
+    console.log(`Server running at http://${address.address}:${address.port}/`);
+});
+
+
+io.on("connection", socket => {
+  socket.on("get-document", async (documentId,userId,title) => {
+    const document = await findOrCreateDocument(documentId,userId,title);
+    if (!document) {
+        return;
+    }
+    socket.join(documentId)
+    socket.emit("load-document", document.noteBook);
+
+    socket.on("send-changes", delta => {
+      socket.broadcast.to(documentId).emit("receive-changes", delta)
+    });
+    socket.on("save-document", async (noteBook,docId) => {
+        await NoteBook.findByIdAndUpdate(documentId, {$set: {noteBook}});
+    })
+  })
+})
+  
+async function findOrCreateDocument(id,userId,title) {
+  if (id == null) return
+
+  const document = await NoteBook.findById(id)
+  if (document) return document;
+
+  const createObj = {
+    title: title,
+    contributers: [],
+    noteBook: {},
+    userId: userId,
+    sharedWith: [],
+    group: ""
+  };
+  console.log(createObj);
+
+  return await NoteBook.create({_id : id ,...createObj})
+}
