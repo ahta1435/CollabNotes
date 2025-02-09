@@ -52,7 +52,7 @@ function SignUp() {
               firstName : firstName,
               lastName: lastName || ""
           };
-          fetch(`https://collab-notes-5lcc.vercel.app/user/signup`,{
+          fetch(`https://collab-notes-5lcc.vercel.app/api/user/signup`,{
             method : "POST",
             mode: 'no-cors',
             headers : {
