@@ -52,7 +52,7 @@ function SignUp() {
               firstName : firstName,
               lastName: lastName || ""
           };
-          fetch(`${process.env.APP_URI}/user/signup`,{
+          fetch(`https://collab-notes-5lcc.vercel.app/user/signup`,{
             method : "POST",
             headers : {
               'Content-type' : "application/json"

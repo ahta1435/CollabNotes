@@ -40,7 +40,7 @@ function Login({}) {
           email : email,
           password: password
         };
-        fetch(`/user/signIn`,{
+        fetch(`https://collab-notes-5lcc.vercel.app/user/signIn`,{
           method : "POST",
           headers : {
               'Content-type' : "application/json"
