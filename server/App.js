@@ -1,8 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
-const CONNECTION_URL = "mongodb://127.0.0.1:27017";
+const CONNECTION_URL = process.env.MONGODB_URI;
 const user = require("./controllers/userController");
 const note = require("./controllers/noteBookController");
 const email = require("./controllers/sendMailController");
