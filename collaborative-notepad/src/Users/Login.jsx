@@ -40,7 +40,7 @@ function Login({}) {
           email : email,
           password: password
         };
-        fetch(`${process.env.APP_URI}/user/signIn`,{
+        fetch(`/user/signIn`,{
           method : "POST",
           headers : {
               'Content-type' : "application/json"
