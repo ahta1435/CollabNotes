@@ -42,6 +42,7 @@ function Login({}) {
         };
         fetch(`https://collab-notes-5lcc.vercel.app/user/signIn`,{
           method : "POST",
+          mode: 'no-cors',
           headers : {
               'Content-type' : "application/json"
           },

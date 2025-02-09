@@ -54,6 +54,7 @@ function SignUp() {
           };
           fetch(`https://collab-notes-5lcc.vercel.app/user/signup`,{
             method : "POST",
+            mode: 'no-cors',
             headers : {
               'Content-type' : "application/json"
             },

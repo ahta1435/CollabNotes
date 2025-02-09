@@ -41,7 +41,7 @@ export function NavMain({
       notesId : currLoc[2]
     };
     const contributorQuery = new URLSearchParams(contributorPrams).toString();
-    const getContributors = await fetch(`${process.env.APP_URI}/notebook/contributors/${contributorQuery}`);
+    const getContributors = await fetch(`${process.env.APP_URI}/notebook/contributors/${contributorQuery}`,{mode: 'no-cors'});
     const response = await getContributors.json();
     setContributors(response.contributors[0]?.contributers || []);
     setTitleName(currLoc[4]);
