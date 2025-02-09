@@ -1,6 +1,7 @@
 const http = require("http");
-const app = require('../App');
-const NoteBook = require('../Schemas/notesSchema');
+const app = require('./App');
+const NoteBook = require('./Schemas/notesSchema');
+require('dotenv').config();
 //port at which the project shld run
 const port = process.env.port || 8000;
 
@@ -8,7 +9,7 @@ const server = http.createServer(app);
 
 const io = require('socket.io')(server,{
     cors : {
-        origin: "http://localhost:5173",
+        origin: `${process.env.MONGODB_URI}`,
         methods: ["GET", "POST"],
     }
 });
