@@ -17,13 +17,15 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(cors());
+app.use(cors({
+    origin: frontendUrl, // Allow only requests from your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+    credentials: true, // Allow sending cookies or credentials if necessary
+  }));
 app.use(express.json());
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'https://collab-notes-7xmm.vercel.app/');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.status(200).end();
+ 
 });
 app.use('/user',user);
 app.use("/notebook",note);
