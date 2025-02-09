@@ -2,13 +2,13 @@
     "version": 2,
     "builds": [
       {
-        "src": "api/*.js",
+        "src": "api/(.*)",
         "use": "@vercel/node"
       }
     ],
     "headers": [
       {
-        "source": "/api/(.*)",
+        "source": "api/(.*)",
         "headers": [
           { "key": "Access-Control-Allow-Credentials", "value": "true" },
           { "key": "Access-Control-Allow-Origin", "value": "*" },
