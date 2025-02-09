@@ -25,84 +25,22 @@ import {
 } from "@/components/ui/sidebar";
 import _ from "lodash";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    }
-  ]
-}
-
-function prepareData(notes) {
+function prepareData(notes,sharedNoteBooks) {
   const groups = _.map(notes, 'group');
   const uniqueGroups = _.uniq(groups);
   const data = {};
   const navMain = [];
+  let sharedObj = {title : "Shared With Me", url : "#", }
+  let shareditems = [];
+  sharedNoteBooks.forEach( data => {
+    let obj = {};
+    obj["title"] = data?.title;
+    obj["url"] =  `dashboard/notes/${data?._id}/${data?.userId}/${data?.title}`;
+    shareditems.push(obj);
+  });
+
+  sharedObj["items"] = shareditems;
+  navMain.push(sharedObj);
   uniqueGroups.forEach((groupName, index) => {
     const obj = {};
     obj["title"] = index == 0 ? groupName || "Default Group" : groupName;
@@ -110,10 +48,9 @@ function prepareData(notes) {
     const items = [];
     const itemsData = _.filter(notes,(item) => item?.group == groupName);
     itemsData.forEach( data => {
-      console.log(data?.url+ "::::end");
       const obj = {};
       obj["title"] = data?.title;
-      obj["url"] = data?.url || `dashboard/notes/${data?._id}/${data?.userId}/${data?.title}`;
+      obj["url"] =  data?.url ? `dashboard/notes/${data?.url}` : `dashboard/notes/${data?._id}/${data?.userId}/${data?.title}`;
       items.push(obj);
     })
     navMain.push({...obj, items});
@@ -127,9 +64,10 @@ export function AppSidebar({
 }) {
 
   const notes = props?.userNotes;
-  const data = prepareData(notes);
-  console.log(data);
-  
+  const sharedNoteBooks = props?.sharedNoteBooks;
+  const data = prepareData(notes,sharedNoteBooks);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userData = user?.userData;
 
   return (
     (<Sidebar collapsible="icon" {...props}>
@@ -137,10 +75,10 @@ export function AppSidebar({
         <TeamSwitcher userNotes={props.userNotes} setUserNotes={props.setUserNotes} setSelectedNoteBook={props.setSelectedNoteBook} setTitleName={props.setTitleName}/>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} userNotes={props.userNotes} setUserNotes={props.setUserNotes} setSelectedNoteBook={props.setSelectedNoteBook} setTitleName={props.setTitleName} setContributors={props.setContributors} setSharedNoteBooks={props.setSharedNoteBooks} sharedNoteBooks={props.sharedNoteBooks}/>
       </SidebarContent>
       <SidebarFooter>
-        {/* <NavUser user={data.user} /> */}
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>)

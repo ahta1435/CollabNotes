@@ -1,8 +1,7 @@
 import React , {useState,useContext} from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from "../components/ui/input";
-import { useHistory } from 'react-router-dom';
-import { UserContext } from '../Context';
+import { useHistory,useLocation } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -15,48 +14,49 @@ import { Label } from "../components/ui/label";
 
 function Login({}) {
   const [email,setEmail] = useState("");
+  const location = useLocation();
   const [password,setPassword] = useState("");
   const history = useHistory();
-  const { user, handleLogin } = useContext(UserContext);
   const handleEmailChange = (e) => {
     const val = e.target.value;
     setEmail(val);
   }
 
+  const {from}  = location.state || { from: { pathname: "/dashboard" } }; 
   const handlePasswordChange = (e) => {
     const val = e.target.value;
     setPassword(val);
   }
 
   const handleSignUp = (e) => {
-    history.push("/signup");
+    const state = history.location.state || {};
+    history.push("/signup",state);
   }
 
   const handleSubmit = () => {
     if (email && password) {
-        try {
-            const dataObj = {
-                email : email,
-                password: password
-            };
-            console.log(JSON.stringify(dataObj));
-            fetch("http://localhost:8000/user/signIn",{
-                method : "POST",
-                headers : {
-                    'Content-type' : "application/json"
-                },
-                body : JSON.stringify(dataObj)
-            }).then(res => res.json())
-            .then(data =>{
-                const sessionId = data?.sessionId;
-                handleLogin(data);
-                if (sessionId) {
-                  history.push('/dashboard');
-                }
-            });
-        } catch (e) {
-            
-        }
+      try {
+        const dataObj = {
+          email : email,
+          password: password
+        };
+        fetch("http://localhost:8000/user/signIn",{
+          method : "POST",
+          headers : {
+              'Content-type' : "application/json"
+          },
+          body : JSON.stringify(dataObj)
+        }).then(res => res.json())
+        .then(data =>{
+          const sessionId = data?.sessionId;
+          localStorage.setItem("user",JSON.stringify(data));
+          if (sessionId) {
+            history.replace(from);
+          }
+        });
+      } catch (e) {
+          
+      }
     }
   }
 

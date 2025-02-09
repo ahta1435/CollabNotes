@@ -32,8 +32,19 @@ io.on("connection", socket => {
     socket.on("send-changes", delta => {
       socket.broadcast.to(documentId).emit("receive-changes", delta)
     });
-    socket.on("save-document", async (noteBook,docId) => {
-        await NoteBook.findByIdAndUpdate(documentId, {$set: {noteBook}});
+    socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
+      if (userId !== loggedInUserId) {
+        const olderNoteBook = await NoteBook.findById(docId);
+        const updatedNoteBook = await NoteBook.findByIdAndUpdate(
+            docId,
+            { $addToSet: { contributers: loggedInUserId } },
+            { new: true }
+        );
+        if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
+          io.emit("contributors-updated", updatedNoteBook?.contributers);
+        }
+      }
+      await NoteBook.findByIdAndUpdate(docId, {$set: {noteBook}});
     })
   })
 })
@@ -50,9 +61,7 @@ async function findOrCreateDocument(id,userId,title) {
     noteBook: {},
     userId: userId,
     sharedWith: [],
-    group: ""
+    group: "Un-Grouped"
   };
-  console.log(createObj);
-
   return await NoteBook.create({_id : id ,...createObj})
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Trash2 } from "lucide-react";
 import { useHistory } from "react-router-dom";
 
 import {
@@ -18,14 +18,61 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { DialogCloseButton } from "./DialogCloseButton";
+import { useState } from "react";
 
 export function NavMain({
-  items
+  items,
+  setTitleName,
+  userNotes,
+  setUserNotes,
+  setSelectedNoteBook,
+  setContributors,
+  setSharedNoteBooks,
+  sharedNoteBooks
 }) {
 
+  const [showDeleteConfimation,setShowDeleteConfirmation] = useState(false);
+  const [deleteId,setDeleteId] = useState(null);
   const history = useHistory();
-  const handleClick = (subItem) => {
+  const handleClick = async (subItem) => {
+    const currLoc = subItem?.url.split("/");
+    const contributorPrams = {
+      notesId : currLoc[2]
+    };
+    const contributorQuery = new URLSearchParams(contributorPrams).toString();
+    const getContributors = await fetch(`http://localhost:8000/notebook/contributors/${contributorQuery}`);
+    const response = await getContributors.json();
+    setContributors(response.contributors[0]?.contributers || []);
+    setTitleName(currLoc[4]);
     history.push(`/${subItem?.url}`);
+  }
+
+
+  const isCurrentUserIsAlsoCollaborator = (subItem) => {
+    const userId = JSON.parse(localStorage.getItem("user"))?.userData?._id;
+    const loc = subItem?.url.split("/");
+    const currentDocOwnerId = loc[3];
+    return userId === currentDocOwnerId;
+  }
+  const deletePopUpProps = {
+    userNotes,
+    setUserNotes,
+    setSelectedNoteBook,
+    setTitleName,
+    setSharedNoteBooks,
+    sharedNoteBooks
+  }
+
+  const isSelected = (currentUrl) => {
+    const loc = history.location.pathname.split("/");
+    const currLoc = currentUrl.split("/");
+    return loc[3] == currLoc[2];
+  }
+
+  const getDeleteId = (subItem) => {
+    const docSplit = subItem?.url.split("/");
+    return docSplit[2];
   }
   return (
     (<SidebarGroup>
@@ -49,11 +96,14 @@ export function NavMain({
               <CollapsibleContent>
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubItem key={subItem.title} className={`${isSelected(subItem?.url) ? 'bg-gray-300' : ''} rounded-md flex items-center justify-between`}>
                       <SidebarMenuSubButton asChild>
-                        <div onClick={()=>handleClick(subItem)}>
-                          <span>{subItem.title}</span>
-                        </div>
+                        <>
+                          <div onClick={()=>handleClick(subItem)} className="cursor-pointer mx-6">
+                            <span>{subItem.title}</span>
+                          </div>
+                          {isCurrentUserIsAlsoCollaborator(subItem) && <DialogCloseButton deleteDocument deleteId={getDeleteId(subItem)} deleteTitleName={subItem.title} {...deletePopUpProps}/>}
+                        </>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

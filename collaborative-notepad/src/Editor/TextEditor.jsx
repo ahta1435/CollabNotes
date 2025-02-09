@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Quill from "quill"
 import "quill/dist/quill.snow.css"
 import { io } from "socket.io-client"
@@ -14,17 +14,20 @@ const TOOLBAR_OPTIONS = [
   [{ color: [] }, { background: [] }],
   [{ script: "sub" }, { script: "super" }],
   [{ align: [] }],
-  ["image", "blockquote", "code-block"],
-  ["clean"],
 ]
 
-export default function TextEditor() {
+export default function TextEditor({setContributors}) {
   const {id :documentId,userId,title,isShare} = useParams();
+  const loggedInUserId = JSON.parse(localStorage.getItem("user"))?.userData?._id;
+  const ref = useRef(null);
   const [socket, setSocket] = useState()
   const [quill, setQuill] = useState()
-//   console.log(documentId);
-
-  // connecting the socket
+   
+  // delete all the changes which has to be synced with the editor if the document is changed
+  useEffect(()=>{
+    clearInterval(ref.current);
+  },[documentId]);
+  
   useEffect(() => {
     const s = io("http://localhost:8000")
     setSocket(s)
@@ -33,6 +36,16 @@ export default function TextEditor() {
       s.disconnect()
     }
   }, []);
+
+  useEffect(() => {
+    if (socket == null || quill == null) return
+    socket.on('contributors-updated', (updatedContributors) => {
+      setContributors(updatedContributors);
+    });
+    return () => {
+      socket.off('contributors-updated');
+    };
+  }, [socket]);
 
   // first time loading the document
   useEffect(() => {
@@ -48,14 +61,22 @@ export default function TextEditor() {
   useEffect(() => {
     if (socket == null || quill == null) return
 
-    const interval = setInterval(() => {
-      socket.emit("save-document", quill.getContents(),documentId)
+    ref.current = setInterval(() => {
+      const delta = quill.getContents();
+      const plainTextDelta = delta.ops.map(op => {
+        return {
+          ...op,
+          // removing the extra arrtibutes
+          attributes: {}
+        };
+      });
+      socket.emit("save-document", plainTextDelta,documentId,loggedInUserId,userId)
     }, SAVE_INTERVAL_MS)
 
     return () => {
-      clearInterval(interval)
+      clearInterval(ref.current)
     }
-  }, [socket, quill])
+  }, [socket, quill,documentId])
 
   useEffect(() => {
     if (socket == null || quill == null) return

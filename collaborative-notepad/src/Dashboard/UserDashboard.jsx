@@ -27,39 +27,84 @@ import {
     Redirect,
     useHistory
 } from "react-router-dom"
-import { UserContext } from '../Context';
 import { useState, useEffect, useMemo, useContext } from "react";
 import TextEditor from "../Editor/TextEditor";
 import _ from "lodash";
 
+
 function UserDashboard() {
   const [userNotes,setUserNotes] = useState([]);
+  const history = useHistory();
   const [selectedId,setSelectedNoteBook] = useState("");
   const [titleName,setTitleName] = useState("");
-  const {user} = useContext(UserContext);
-  const userData = user;
+  const [contributors,setContributors] = useState([]);
+  const [collaborators,setCollaborators] = useState([]);
+  const [sharedNoteBooks,setSharedNoteBooks] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userData = user?.userData;
+
+  async function fetchData() {
+    try {
+      const loc = history.location.pathname.split("/");
+      const userId = userData?._id;
+      const params = {userId};
+      const queryString = new URLSearchParams(params).toString();
+      const jsonData = await fetch(`http://localhost:8000/notebook/notes/${queryString}`);
+      const data = await jsonData.json();
+
+      const contributorPrams = {
+        notesId : loc[3]
+      };
+
+      const contributorQuery = new URLSearchParams(contributorPrams).toString();
+      const getContributors = await fetch(`http://localhost:8000/notebook/contributors/${contributorQuery}`);
+      const response = await getContributors.json();
+      
+      setContributors(response.contributors[0]?.contributers || []);
+      setUserNotes(data?.data?.data);
+      setSharedNoteBooks(data?.data?.sharedNotes);
+      
+    } catch (e) {
+    
+    }
+  }
 
   useEffect(() => {
-    async function fetchData() {
-        try {
-            const userId = userData?.userData?._id;
-            const params = {
-                userId
-            };
-            const queryString = new URLSearchParams(params).toString();
-            const jsonData = await fetch(`http://localhost:8000/notebook/notes/${queryString}`);
-            const data = await jsonData.json();
-            setUserNotes(data?.data);
-        } catch (e) {
-    
-        }
-    }
     fetchData();
   },[]);
 
+  useEffect(() => {
+    if (contributors.length == 0) {
+      setCollaborators([]);
+    }
+    async function fetchData() {
+      try {
+        const userIds = contributors;
+        const dataObj = {userIds};
+        const jsonData = await fetch(`http://localhost:8000/user/getUsers`, {method : "POST",
+          headers : {
+              'Content-type' : "application/json"
+          },
+          body : JSON.stringify(dataObj)});
+        const data = await jsonData.json();
+        setCollaborators(data?.data);
+      } catch (e) {
+        
+      }
+    }
+    fetchData();
+  },[contributors]);
+
+  const isCurrentUserIsAlsoCollaborator = () => {
+    const userId = userData?._id;
+    const loc = history.location.pathname.split("/");
+    const currentDocOwnerId = loc[4];
+    return userId === currentDocOwnerId;
+  }
+
   return (
     <SidebarProvider>
-      <AppSidebar userNotes={userNotes} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setTitleName={setTitleName}/>
+      <AppSidebar userNotes={userNotes} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setTitleName={setTitleName} key={userNotes.length} setContributors={setContributors} setSharedNoteBooks={setSharedNoteBooks} sharedNoteBooks={sharedNoteBooks}/>
      <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
@@ -69,7 +114,7 @@ function UserDashboard() {
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
-                    Title :: 
+                    Title
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
@@ -79,27 +124,31 @@ function UserDashboard() {
               </BreadcrumbList>
             </Breadcrumb>
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <DialogCloseButton/>
+            {isCurrentUserIsAlsoCollaborator() && <DialogCloseButton addGroup setTitleName={setTitleName} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setSharedNoteBooks={setSharedNoteBooks}/>}
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <DialogCloseButton shareLink/>
+            {isCurrentUserIsAlsoCollaborator() && <DialogCloseButton inviteContributor/>}
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <div className="flex">
-                <span className="py-2">Collaborators ::</span>
+            {isCurrentUserIsAlsoCollaborator() && <DialogCloseButton shareLink/>}
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            {!_.isEmpty(collaborators) && <div className="flex">
+              <span className="py-2">Collaborators ::</span>
+              {collaborators?.map((item)=>(
                 <Avatar className="mx-3 my-1 h-8 w-8 rounded-lg">
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{item.firstName.slice(0,2)}</AvatarFallback>
                 </Avatar>
-            </div>
+              ))}
+            </div>}
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <Switch>
+          <Switch>
             <Route path="/dashboard/notes/:id/:userId?/:title?/:isShare?">
-              <TextEditor/>
+              <TextEditor setContributors={setContributors}/>
             </Route>
             <Route path="/dashboard/notes" >
-                <Redirect to={`/dashboard/notes/${selectedId}/${userData?.userData?._id}/${titleName}`} />
+              <Redirect to={`/dashboard/notes/${selectedId}/${userData?._id}/${titleName}`} />
             </Route>
-        </Switch>
+          </Switch>
         </div>
       </SidebarInset>
     </SidebarProvider>

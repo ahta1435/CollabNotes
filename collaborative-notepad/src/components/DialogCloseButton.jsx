@@ -1,4 +1,4 @@
-import { Copy, Plus, Share, Pen} from "lucide-react"
+import { Copy, Plus, Share, Pen, Trash2} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,13 +24,20 @@ export function DialogCloseButton({
   userNotes,
   setUserNotes,
   setSelectedNoteBook,
-  setTitleName
+  setTitleName,
+  deleteDocument,
+  deleteId,
+  inviteContributor,
+  deleteTitleName,
+  addGroup,
+  setSharedNoteBooks
 }) {
 
   const [title,setTitle] = useState("");
+  const [groupName,setGroupName] = useState("");
   const history = useHistory();
 
-  const userData = useContext(UserContext);
+  const userData = JSON.parse(localStorage.getItem("user"));
   
   const handleEmailChange = () => {};
   const handleTitleChange = (event) => {
@@ -48,20 +55,120 @@ export function DialogCloseButton({
     const docId = uuidV4();
     setSelectedNoteBook(docId);
     setTitleName(title);
-    setUserNotes([...userNotes,{title:title,notesId:docId,url:`${docId}/${userData?.userData?._id}/${title}`}]);
-    history.push(`/dashboard/notes/${docId}`);
+    setUserNotes([...userNotes,{title:title,notesId:docId,url:`${docId}/${userData?.userData?._id}/${title}`,group: "Un-Grouped"}]);
+    history.push(`/dashboard/notes/${docId}/${userData?.userData?._id}/${title}`);
   };
+
+  const getText = () => {
+    if (shareLink) return "Share";
+    if (inviteContributor) return "Add Collaborator";
+    if (addDocument) return "Create New";
+    if (addGroup) return "Move to a Group"
+  }
+
+  const handleGroupNameInput = (e) => {
+    setGroupName(e.target.value)
+  }
+
+  const handleAddGroup = async () => {
+    const loc = history.location.pathname.split("/");
+    const dataObj = {
+      group : groupName,
+      id : loc[3]
+    }
+    const userParams = {
+      userId : userData?.userData?._id
+    };
+    const userQueryString = new URLSearchParams(userParams).toString();
+    const fetcher = async () => await fetch(`http://localhost:8000/notebook/notes/update`,{method : "POST",headers : {'Content-type' : "application/json"},body : JSON.stringify(dataObj)});
+    const getAllDataAfterDelete = async () => await fetch(`http://localhost:8000/notebook/notes/${userQueryString}`);
+    fetcher().then(async (res) => {
+      try {
+        const f = await res.json();
+        const resp = await getAllDataAfterDelete();
+        const data = await resp.json();
+        const usersList = data?.data?.data;
+        const docId = usersList[0]?._id;
+        const title = usersList[0]?.title;
+        setUserNotes(usersList);
+        setSharedNoteBooks(data?.data?.sharedNotes);
+        setSelectedNoteBook(docId);
+        setTitleName(title);
+        history.push(`/dashboard/notes/${docId}/${userData?.userData?._id}/${title}`);
+      } catch (err) {
+        console.log(err);
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  const handleDelete = async () => {
+    const params = {
+      notesId: deleteId
+    };
+    const userParams = {
+      userId : userData?.userData?._id
+    };
+    const queryString = new URLSearchParams(params).toString();
+    const userQueryString = new URLSearchParams(userParams).toString();
+    const deleteFetcher = async () => await fetch(`http://localhost:8000/notebook/notes/${queryString}`,{method : "DELETE"});
+    const getAllDataAfterDelete = async () => await fetch(`http://localhost:8000/notebook/notes/${userQueryString}`);
+    deleteFetcher().then( async (res) => {
+      try {
+        const k = await res.json();
+        const resp = await getAllDataAfterDelete();
+        const data = await resp.json();
+        const usersList = data?.data?.data || [];
+        const docId = usersList[0]?._id || "";
+        const title = usersList[0]?.title || "";
+        setUserNotes(usersList);
+        setSelectedNoteBook(docId);
+        setSharedNoteBooks(data?.data?.sharedNotes);
+        setTitleName(title);
+        if (!docId) {
+          history.push(`/dashboard`);
+        } else {
+          history.push(`/dashboard/notes/${docId}/${userData?.userData?._id}/${title}`);
+        }
+      } catch (error) {
+
+      }
+    }).catch(error => {
+
+    });
+  }
+
+  const handleEmailInvite = () => {
+    // const { to, subject, message } = req.body;
+    const loc = history.location.pathname.split("/");
+    const mailData = {
+      to : "haqueahtashamul@gmail.com",
+      subject : `Inviting to Collaborate on Note Book Named - ${loc[5]}`,
+      message: `<h3>Please Find the Link to Join the Note <a href=${window.location.origin}${history.location.pathname}/shared>Path to App</a></h3>`
+    }
+    const fetcher = async () => await fetch(`http://localhost:8000/mail/send-email`,{method : "POST",headers : {'Content-type' : "application/json"},body : JSON.stringify(mailData)});
+    fetcher().then(async (data) => {
+      try {
+        const res = data.json();
+        console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    })
+  }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-               {!shareLink && !addDocument && <Plus className="size-4" />}
+               {(inviteContributor || addGroup) && <Plus className="size-4" />}
                {shareLink && <Share className="size-4"/>}
                {addDocument && <Pen className="size-4"/>}
+               {deleteDocument && <Trash2 className="size-4"/>}
               </div>
-              <div className="font-medium text-muted-foreground">{shareLink ? "Share" : !addDocument ? "Add Collaborator" : "Create New"}</div>
+              <div className="font-medium text-muted-foreground">{getText()}</div>
         </Button>
       </DialogTrigger>
       {shareLink && <DialogContent className="sm:max-w-md">
@@ -95,7 +202,32 @@ export function DialogCloseButton({
           </DialogClose>
         </DialogFooter>
       </DialogContent>}
-      {!shareLink && !addDocument && <DialogContent className="sm:max-w-md">
+
+      {addGroup && <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add Current NoteBook To A Group</DialogTitle>
+          <DialogDescription>
+            Upon changing the group your notes will be visible in that Group only
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex items-center space-x-2">
+          <div className="grid flex-1 gap-2">
+            <Label htmlFor="link" className="sr-only">
+              Add Group Name
+            </Label>
+             <Input type="text" id="group" placeholder="Add Group Name" onChange={handleGroupNameInput}/>
+          </div>
+        </div>
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            <Button type="button" variant="secondary" onClick={handleAddGroup}>
+              Move
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>}
+
+      {inviteContributor && <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Invite Contibutor</DialogTitle>
           <DialogDescription>
@@ -112,12 +244,35 @@ export function DialogCloseButton({
         </div>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button type="button" variant="secondary" onClick={handleEmailInvite}>
               Send Invite
             </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>}
+
+      {deleteDocument && <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Delete NoteBook</DialogTitle>
+          <DialogDescription>
+            Are you Sure You want to delete?
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex items-center space-x-2">
+          <div className="grid flex-1 gap-2">
+            The Following NoteBook Will be deleted
+            <DialogTitle>{deleteTitleName}</DialogTitle>
+          </div>
+        </div>
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            <Button type="button" variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>}
+
       {addDocument && <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Title</DialogTitle>

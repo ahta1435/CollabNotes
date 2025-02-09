@@ -1,15 +1,27 @@
 import React from 'react';
-import { Route, Redirect, useHistory } from 'react-router-dom';
-function PrivateRoute({ component: Component, ...rest }) {
-  const history = useHistory();
-  const isAuthenticated = localStorage.getItem("collabeditorSession") || history.location.pathname.includes("share");
+import { Route, Redirect } from 'react-router-dom';
+
+const PrivateRoute = ({ component: Component, ...rest }) => {
+  const isAuthenticated = localStorage.getItem("user");
+  const currentLocation = window.location.pathname; // Capture the current URL
   return (
     <Route
       {...rest}
-      render={(props) =>
-        isAuthenticated ? <Component {...props} /> : <Redirect to="/login" />
+      render={props =>
+        isAuthenticated ? (
+          <Component {...props} />
+        ) : (
+          // If not authenticated, store the current location in the state and redirect to /login
+          <Redirect 
+            to={{
+              pathname: "/login",
+              state: { from: currentLocation } // Pass the intended URL as state
+            }} 
+          />
+        )
       }
     />
   );
-}
+};
+
 export default PrivateRoute;

@@ -24,6 +24,10 @@ function SignUp() {
     setEmail(val);
   }
 
+  const handleLogin = () => {
+    history.push("/");
+  }
+
   const handlePasswordChange = (e) => {
     const val = e.target.value;
     setPassword(val);
@@ -56,7 +60,8 @@ function SignUp() {
             body : JSON.stringify(dataObj)
           }).then(res => res.json())
           .then(data =>{
-            history.push("/login");
+            const state = history.location.state || {};
+            history.push("/login",state);
           });
       } catch (e) {
           
@@ -81,6 +86,7 @@ function SignUp() {
       </CardContent>
       <CardFooter>
         <Button onClick={handleSubmit}>SignUp</Button>
+         <Button className="mx-10" onClick={handleLogin}>Already Have an Account? Login </Button>
       </CardFooter>
     </Card>
   )
