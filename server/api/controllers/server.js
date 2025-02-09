@@ -1,6 +1,6 @@
 const http = require("http");
-const app = require('./api/App');
-const NoteBook = require('./api/Schemas/notesSchema');
+const app = require('../App');
+const NoteBook = require('../Schemas/notesSchema');
 //port at which the project shld run
 const port = process.env.port || 8000;
 

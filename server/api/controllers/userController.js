@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const {v4 : uuidV4} = require("uuid");
 const _ = require('lodash');
 const User = require("../Schemas/userSchema.js");
-const { setUser } = require('../../service/auth.js');
+const { setUser } = require('../service/auth.js');
 const router = Router();
 
 function validateUserInput(dataObj) {
