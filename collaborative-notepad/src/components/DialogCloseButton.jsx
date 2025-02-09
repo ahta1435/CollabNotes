@@ -80,8 +80,8 @@ export function DialogCloseButton({
       userId : userData?.userData?._id
     };
     const userQueryString = new URLSearchParams(userParams).toString();
-    const fetcher = async () => await fetch(`${process.env.APP_URI}/notebook/notes/update`,{method : "POST",headers : {'Content-type' : "application/json"},body : JSON.stringify(dataObj) ,mode: 'no-cors'});
-    const getAllDataAfterDelete = async () => await fetch(`${process.env.APP_URI}/notebook/notes/${userQueryString}`,{mode: 'no-cors'});
+    const fetcher = async () => await fetch(`https://collab-notes-5lcc.vercel.app/api/notebook/notes/update`,{method : "POST",headers : {'Content-type' : "application/json"},body : JSON.stringify(dataObj) ,mode: 'no-cors'});
+    const getAllDataAfterDelete = async () => await fetch(`https://collab-notes-5lcc.vercel.app/api/notebook/notes/${userQueryString}`,{mode: 'no-cors'});
     fetcher().then(async (res) => {
       try {
         const f = await res.json();
@@ -112,8 +112,8 @@ export function DialogCloseButton({
     };
     const queryString = new URLSearchParams(params).toString();
     const userQueryString = new URLSearchParams(userParams).toString();
-    const deleteFetcher = async () => await fetch(`${process.env.APP_URI}/notebook/notes/${queryString}`,{method : "DELETE",mode: 'no-cors'});
-    const getAllDataAfterDelete = async () => await fetch(`${process.env.APP_URI}/notebook/notes/${userQueryString}`,{mode: 'no-cors'});
+    const deleteFetcher = async () => await fetch(`https://collab-notes-5lcc.vercel.app/api/notebook/notes/${queryString}`,{method : "DELETE",mode: 'no-cors'});
+    const getAllDataAfterDelete = async () => await fetch(`https://collab-notes-5lcc.vercel.app/api/notebook/notes/${userQueryString}`,{mode: 'no-cors'});
     deleteFetcher().then( async (res) => {
       try {
         const k = await res.json();
@@ -147,7 +147,7 @@ export function DialogCloseButton({
       subject : `Inviting to Collaborate on Note Book Named - ${loc[5]}`,
       message: `<h3>Please Find the Link to Join the Note <a href=${window.location.origin}${history.location.pathname}/shared>Path to App</a></h3>`
     }
-    const fetcher = async () => await fetch(`${process.env.APP_URI}/mail/send-email`,{method : "POST",headers : {'Content-type' : "application/json"},body : JSON.stringify(mailData),mode: 'no-cors'});
+    const fetcher = async () => await fetch(`https://collab-notes-5lcc.vercel.app/api/mail/send-email`,{method : "POST",headers : {'Content-type' : "application/json"},body : JSON.stringify(mailData),mode: 'no-cors'});
     fetcher().then(async (data) => {
       try {
         const res = data.json();
