@@ -49,7 +49,7 @@ function UserDashboard() {
       const userId = userData?._id;
       const params = {userId};
       const queryString = new URLSearchParams(params).toString();
-      const jsonData = await fetch(`http://localhost:8000/notebook/notes/${queryString}`);
+      const jsonData = await fetch(`${process.env.APP_URI}/notebook/notes/${queryString}`);
       const data = await jsonData.json();
 
       const contributorPrams = {
@@ -57,7 +57,7 @@ function UserDashboard() {
       };
 
       const contributorQuery = new URLSearchParams(contributorPrams).toString();
-      const getContributors = await fetch(`http://localhost:8000/notebook/contributors/${contributorQuery}`);
+      const getContributors = await fetch(`${process.env.APP_URI}/notebook/contributors/${contributorQuery}`);
       const response = await getContributors.json();
       
       setContributors(response.contributors[0]?.contributers || []);
@@ -81,7 +81,7 @@ function UserDashboard() {
       try {
         const userIds = contributors;
         const dataObj = {userIds};
-        const jsonData = await fetch(`http://localhost:8000/user/getUsers`, {method : "POST",
+        const jsonData = await fetch(`${process.env.APP_URI}/user/getUsers`, {method : "POST",
           headers : {
               'Content-type' : "application/json"
           },

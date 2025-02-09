@@ -52,7 +52,7 @@ function SignUp() {
               firstName : firstName,
               lastName: lastName || ""
           };
-          fetch("http://localhost:8000/user/signup",{
+          fetch(`${process.env.APP_URI}/user/signup`,{
             method : "POST",
             headers : {
               'Content-type' : "application/json"
