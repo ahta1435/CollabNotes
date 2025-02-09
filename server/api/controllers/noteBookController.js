@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const NoteBook = require("../Schemas/notesSchema");
 const router = Router();
-const socket = require("../server");
+const socket = require("../../server");
 
 router.get('/notes/:userId',async (req, res) => {   
    try {
