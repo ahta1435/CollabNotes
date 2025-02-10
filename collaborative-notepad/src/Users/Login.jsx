@@ -42,13 +42,12 @@ function Login({}) {
         };
         const res = await fetch(`https://collab-notes-khaki.vercel.app/user/signIn`,{
           method : "POST",
-          mode: 'no-cors',
           headers : {
               'Content-type' : "application/json"
           },
           body : JSON.stringify(dataObj)
         })
-        const data = await data.json();
+        const data = await res.json();
         const sessionId = data?.sessionId;
         localStorage.setItem("user",JSON.stringify(data));
         if (sessionId) {

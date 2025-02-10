@@ -54,7 +54,6 @@ function SignUp() {
           };
           const res = await fetch(`https://collab-notes-khaki.vercel.app/user/signup`,{
             method : "POST",
-            mode: 'no-cors',
             headers : {
               'Content-type' : "application/json"
             },
