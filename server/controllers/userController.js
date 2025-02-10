@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const {v4 : uuidV4} = require("uuid");
 const _ = require('lodash');
 const User = require("../Schemas/userSchema.js");
