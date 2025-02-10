@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label"
 import { UserContext } from '../Context';
 import { v4 as uuidV4 } from "uuid";
 import { useHistory, useParams } from 'react-router-dom';
-import { useState,useContext } from "react"
+import { useState,useContext } from "react";
 
 export function DialogCloseButton({
   shareLink,
@@ -30,7 +30,8 @@ export function DialogCloseButton({
   inviteContributor,
   deleteTitleName,
   addGroup,
-  setSharedNoteBooks
+  setSharedNoteBooks,
+  setShowLoader
 }) {
 
   const [title,setTitle] = useState("");
@@ -79,6 +80,7 @@ export function DialogCloseButton({
     const userParams = {
       userId : userData?.userData?._id
     };
+    setShowLoader(true);
     const userQueryString = new URLSearchParams(userParams).toString();
     const fetcher = async () => await fetch(`https://collabnotes-uj7x.onrender.com/notebook/notes/update`,{method : "POST",headers : {'Content-type' : "application/json"},body : JSON.stringify(dataObj)});
     const getAllDataAfterDelete = async () => await fetch(`https://collabnotes-uj7x.onrender.com/notebook/notes/${userQueryString}`);
@@ -94,16 +96,20 @@ export function DialogCloseButton({
         setSharedNoteBooks(data?.data?.sharedNotes);
         setSelectedNoteBook(docId);
         setTitleName(title);
+        setShowLoader(false);
         history.push(`/dashboard/notes/${docId}/${userData?.userData?._id}/${title}`);
       } catch (err) {
         console.log(err);
+        setShowLoader(false);
       }
     }).catch((err) => {
       console.log(err);
+      setShowLoader(false);
     });
   }
 
   const handleDelete = async () => {
+    setShowLoader(true);
     const params = {
       notesId: deleteId
     };
@@ -126,16 +132,17 @@ export function DialogCloseButton({
         setSelectedNoteBook(docId);
         setSharedNoteBooks(data?.data?.sharedNotes);
         setTitleName(title);
+        setShowLoader(false);
         if (!docId) {
           history.push(`/dashboard`);
         } else {
           history.push(`/dashboard/notes/${docId}/${userData?.userData?._id}/${title}`);
         }
       } catch (error) {
-
+        setShowLoader(false);
       }
     }).catch(error => {
-
+      setShowLoader(false);
     });
   }
 

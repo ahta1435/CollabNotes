@@ -30,6 +30,7 @@ import {
 import { useState, useEffect, useMemo, useContext } from "react";
 import TextEditor from "../Editor/TextEditor";
 import _ from "lodash";
+import Loader from "../Loader/Loader";
 
 
 function UserDashboard() {
@@ -41,10 +42,12 @@ function UserDashboard() {
   const [collaborators,setCollaborators] = useState([]);
   const [sharedNoteBooks,setSharedNoteBooks] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
+  const [showLoader,setShowLoader] = useState(false);
   const userData = user?.userData;
 
   async function fetchData() {
     try {
+      setShowLoader(true);
       const loc = history.location.pathname.split("/");
       const userId = userData?._id;
       const params = {userId};
@@ -63,9 +66,10 @@ function UserDashboard() {
       setContributors(response.contributors[0]?.contributers || []);
       setUserNotes(data?.data?.data);
       setSharedNoteBooks(data?.data?.sharedNotes);
+      setShowLoader(false);
       
     } catch (e) {
-    
+      setShowLoader(false);
     }
   }
 
@@ -79,6 +83,7 @@ function UserDashboard() {
     }
     async function fetchData() {
       try {
+        setShowLoader(true);
         const userIds = contributors;
         const dataObj = {userIds};
         const jsonData = await fetch(`https://collabnotes-uj7x.onrender.com/user/getUsers`, {method : "POST",
@@ -88,8 +93,9 @@ function UserDashboard() {
           body : JSON.stringify(dataObj)});
         const data = await jsonData.json();
         setCollaborators(data?.data);
+        setShowLoader(false);
       } catch (e) {
-        
+        setShowLoader(false);
       }
     }
     fetchData();
@@ -104,7 +110,8 @@ function UserDashboard() {
 
   return (
     <SidebarProvider>
-      <AppSidebar userNotes={userNotes} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setTitleName={setTitleName} key={userNotes.length} setContributors={setContributors} setSharedNoteBooks={setSharedNoteBooks} sharedNoteBooks={sharedNoteBooks}/>
+      {showLoader && <Loader/>}
+      <AppSidebar userNotes={userNotes} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setTitleName={setTitleName} key={userNotes.length} setContributors={setContributors} setSharedNoteBooks={setSharedNoteBooks} sharedNoteBooks={sharedNoteBooks} selectedId={selectedId} setShowLoader={setShowLoader}/>
      <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
@@ -124,7 +131,7 @@ function UserDashboard() {
               </BreadcrumbList>
             </Breadcrumb>
             <Separator orientation="vertical" className="mr-2 h-4" />
-            {isCurrentUserIsAlsoCollaborator() && <DialogCloseButton addGroup setTitleName={setTitleName} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setSharedNoteBooks={setSharedNoteBooks}/>}
+            {isCurrentUserIsAlsoCollaborator() && <DialogCloseButton addGroup setTitleName={setTitleName} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setSharedNoteBooks={setSharedNoteBooks} setShowLoader={setShowLoader}/>}
             <Separator orientation="vertical" className="mr-2 h-4" />
             {isCurrentUserIsAlsoCollaborator() && <DialogCloseButton inviteContributor/>}
             <Separator orientation="vertical" className="mr-2 h-4" />

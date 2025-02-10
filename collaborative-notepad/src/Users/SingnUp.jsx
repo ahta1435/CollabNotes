@@ -10,9 +10,11 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Label } from "../components/ui/label";
+import Loader from '../Loader/Loader';
 
 function SignUp() {
   const [email,setEmail] = useState("");
+  const [showLoader,setShowLoader] = useState(false);
   const [password,setPassword] = useState("");
   const [firstName,setFirstName] = useState("");
   const [lastName,setLastName] = useState("");
@@ -52,6 +54,7 @@ function SignUp() {
               firstName : firstName,
               lastName: lastName || ""
           };
+          setShowLoader(true);
           const res = await fetch(`https://collabnotes-uj7x.onrender.com/user/signup`,{
             method : "POST",
             headers : {
@@ -61,16 +64,19 @@ function SignUp() {
           })
           const data = await res.json();
           const state = history.location.state || {};
+          setShowLoader(false);
           history.push("/login",state);
 
       } catch (e) {
           console.log(e);
+          setShowLoader(false)
       }
     }
   }
 
   return (  
     <Card className="w-200 h-250 items-center justify-center flex-row">
+      {showLoader && <Loader/>}
       <CardHeader>
         <CardTitle>Welcome To Collaborative Note App</CardTitle>
       </CardHeader>

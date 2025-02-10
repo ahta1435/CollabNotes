@@ -75,7 +75,7 @@ export function AppSidebar({
         <TeamSwitcher userNotes={props.userNotes} setUserNotes={props.setUserNotes} setSelectedNoteBook={props.setSelectedNoteBook} setTitleName={props.setTitleName}/>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} userNotes={props.userNotes} setUserNotes={props.setUserNotes} setSelectedNoteBook={props.setSelectedNoteBook} setTitleName={props.setTitleName} setContributors={props.setContributors} setSharedNoteBooks={props.setSharedNoteBooks} sharedNoteBooks={props.sharedNoteBooks}/>
+        <NavMain items={data.navMain} userNotes={props.userNotes} setUserNotes={props.setUserNotes} setSelectedNoteBook={props.setSelectedNoteBook} setTitleName={props.setTitleName} setContributors={props.setContributors} setSharedNoteBooks={props.setSharedNoteBooks} sharedNoteBooks={props.sharedNoteBooks} selectedId={props.selectedId} setShowLoader={props.setShowLoader}/>
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={userData} />

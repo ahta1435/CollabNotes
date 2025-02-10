@@ -29,23 +29,36 @@ export function NavMain({
   setSelectedNoteBook,
   setContributors,
   setSharedNoteBooks,
-  sharedNoteBooks
+  sharedNoteBooks,
+  selectedId,
+  setShowLoader
 }) {
 
   const [showDeleteConfimation,setShowDeleteConfirmation] = useState(false);
-  const [deleteId,setDeleteId] = useState(null);
   const history = useHistory();
   const handleClick = async (subItem) => {
-    const currLoc = subItem?.url.split("/");
-    const contributorPrams = {
-      notesId : currLoc[2]
-    };
-    const contributorQuery = new URLSearchParams(contributorPrams).toString();
-    const getContributors = await fetch(`https://collabnotes-uj7x.onrender.com/notebook/contributors/${contributorQuery}`);
-    const response = await getContributors.json();
-    setContributors(response.contributors[0]?.contributers || []);
-    setTitleName(currLoc[4]);
-    history.push(`/${subItem?.url}`);
+    try {
+      const currLoc = subItem?.url.split("/");
+      const contributorPrams = {
+        notesId : currLoc[2]
+      };
+      if (selectedId == currLoc[2]) {
+        return;
+      }
+      setShowLoader(true);
+    
+      const contributorQuery = new URLSearchParams(contributorPrams).toString();
+      const getContributors = await fetch(`https://collabnotes-uj7x.onrender.com/notebook/contributors/${contributorQuery}`);
+      const response = await getContributors.json();
+      setContributors(response.contributors[0]?.contributers || []);
+      setTitleName(currLoc[4]);
+      setShowLoader(false);
+      history.push(`/${subItem?.url}`);
+    } catch(err) {
+      setShowLoader(false);
+      console.log(err);
+    }
+   
   }
 
 
@@ -61,7 +74,8 @@ export function NavMain({
     setSelectedNoteBook,
     setTitleName,
     setSharedNoteBooks,
-    sharedNoteBooks
+    sharedNoteBooks,
+    setShowLoader
   }
 
   const isSelected = (currentUrl) => {
