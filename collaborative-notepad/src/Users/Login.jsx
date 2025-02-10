@@ -65,9 +65,12 @@ function Login({}) {
         try {
           const data = await res.json();
           const sessionId = data?.sessionId;
-          localStorage.setItem("user",JSON.stringify(data));
           if (sessionId) {
+            localStorage.setItem("user",JSON.stringify(data));
             history.replace(from);
+          } else {
+            setShowToast(true);
+            setToastMessage(error);
           }
           setShowLoader(false);
         } catch(error) {
