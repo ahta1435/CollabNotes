@@ -14,7 +14,7 @@ mongoose.connect(CONNECTION_URL,{
 
 const app = express();
 
-const frontendUrl = "https://collab-notes-7xmm.vercel.app";
+const frontendUrl = "https://collab-notes-frontend-iota.vercel.app";
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cors({
