@@ -49,7 +49,7 @@ function UserDashboard() {
       const userId = userData?._id;
       const params = {userId};
       const queryString = new URLSearchParams(params).toString();
-      const jsonData = await fetch(`https://collab-notes-khaki.vercel.app/notebook/notes/${queryString}`,{mode: 'no-cors'});
+      const jsonData = await fetch(`https://collab-notes-khaki.vercel.app/notebook/notes/${queryString}`);
       const data = await jsonData.json();
 
       const contributorPrams = {
@@ -57,7 +57,7 @@ function UserDashboard() {
       };
 
       const contributorQuery = new URLSearchParams(contributorPrams).toString();
-      const getContributors = await fetch(`https://collab-notes-khaki.vercel.app/notebook/contributors/${contributorQuery}`,{mode: 'no-cors'});
+      const getContributors = await fetch(`https://collab-notes-khaki.vercel.app/notebook/contributors/${contributorQuery}`);
       const response = await getContributors.json();
       
       setContributors(response.contributors[0]?.contributers || []);
@@ -81,7 +81,7 @@ function UserDashboard() {
       try {
         const userIds = contributors;
         const dataObj = {userIds};
-        const jsonData = await fetch(`https://collab-notes-khaki.vercel.app/user/getUsers`, {method : "POST",mode: 'no-cors',
+        const jsonData = await fetch(`https://collab-notes-khaki.vercel.app/user/getUsers`, {method : "POST",
           headers : {
               'Content-type' : "application/json"
           },
