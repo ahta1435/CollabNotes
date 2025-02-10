@@ -30,13 +30,13 @@ function Login({}) {
     setEmail(val);
   }
 
-  useEffect(() => {
-    if (showToast) {
-      setTimeout(()=>{
-        setShowToast(false)
-      },2500);
-    }
-  },[showToast]);
+  // useEffect(() => {
+  //   if (showToast) {
+  //     setTimeout(()=>{
+  //       setShowToast(false)
+  //     },2500);
+  //   }
+  // },[showToast]);
   
   const {from}  = location.state || { from: { pathname: "/dashboard" } }; 
   const handlePasswordChange = (e) => {
@@ -106,8 +106,8 @@ function Login({}) {
         <Input type="email" id="email" placeholder="email" onChange={handleEmailChange}/>
         <Label htmlFor="password">Password</Label>
         <Input type="password" id="password" placeholder="password" onChange={handlePasswordChange}/>
-        {showToast && <div className='decoration-red-700'>{toastMessage}</div>}
       </CardContent>
+        {showToast && <div className='text-red-500'>{toastMessage}</div>}
       <CardFooter>
         <Button onClick={handleSubmit}>Login</Button>
         <Button className="mx-10" onClick={handleSignUp}>New Here? SignUp</Button>
