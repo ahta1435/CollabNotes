@@ -15,58 +15,61 @@ const io = require('socket.io')(server,{
 });
 
 server.listen();
-// server.listen(port, () => {
-//     const address = server.address();
-    
-//     console.log(`Server running at http://${address.address}:${address.port}/`);
-// });
-
-
 io.on("connection", socket => {
   console.log("============connected---------");
   socket.on("get-document", async (documentId,userId,title) => {
-    const document = await findOrCreateDocument(documentId,userId,title);
-    console.log("---------Logged documentId-----------", documentId);
-    if (!document) {
-        return;
-    }
-    console.log("---------User Id-----------", userId);
-    socket.join(documentId)
-    socket.emit("load-document", document.noteBook);
-
-    socket.on("send-changes", delta => {
-      socket.broadcast.to(documentId).emit("receive-changes", delta)
-    });
-    socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
-      if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
-        const olderNoteBook = await NoteBook.findById(docId);
-        const updatedNoteBook = await NoteBook.findByIdAndUpdate(
-            docId,
-            { $addToSet: { contributers: loggedInUserId } },
-            { new: true }
-        );
-        if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
-          io.emit("contributors-updated", updatedNoteBook?.contributers);
-        }
+    try {
+      const document = await findOrCreateDocument(documentId,userId,title);
+      console.log("---------Logged documentId-----------", documentId);
+      if (!document) {
+          return;
       }
-      await NoteBook.findByIdAndUpdate(docId, {$set: {noteBook}});
-    })
+      console.log("---------User Id-----------", userId);
+      socket.join(documentId)
+      socket.emit("load-document", document.noteBook);
+  
+      socket.on("send-changes", delta => {
+        socket.broadcast.to(documentId).emit("receive-changes", delta)
+      });
+      socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
+        if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
+          const olderNoteBook = await NoteBook.findById(docId);
+          const updatedNoteBook = await NoteBook.findByIdAndUpdate(
+              docId,
+              { $addToSet: { contributers: loggedInUserId } },
+              { new: true }
+          );
+          if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
+            io.emit("contributors-updated", updatedNoteBook?.contributers);
+          }
+        }
+        await NoteBook.findByIdAndUpdate(docId, {$set: {noteBook}});
+      })
+    } catch(error) {
+      console.log("Error while fetching document", error);
+    }
+   
   })
 })
   
 async function findOrCreateDocument(id,userId,title) {
-  if (id == null) return
-
-  const document = await NoteBook.findById(id)
-  if (document) return document;
-
-  const createObj = {
-    title: title,
-    contributers: [],
-    noteBook: {},
-    userId: userId,
-    sharedWith: [],
-    group: "Un-Grouped"
-  };
-  return await NoteBook.create({_id : id ,...createObj})
+  try {
+    if (id == null) return
+    console.log("+++++Logging ID++++",id);
+    const document = await NoteBook.findById(id)
+    if (document) return document;
+  
+    const createObj = {
+      title: title,
+      contributers: [],
+      noteBook: {},
+      userId: userId,
+      sharedWith: [],
+      group: "Un-Grouped"
+    };
+    return await NoteBook.create({_id : id ,...createObj})
+  } catch(error) {
+    console.log("Error while creating document", error);
+  }
+ 
 }
