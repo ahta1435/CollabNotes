@@ -107,7 +107,7 @@ function Login({}) {
         <Label htmlFor="password">Password</Label>
         <Input type="password" id="password" placeholder="password" onChange={handlePasswordChange}/>
       </CardContent>
-        {showToast && <div className='text-red-500'>{toastMessage}</div>}
+        {showToast && <div className='p-6 text-red-500'>{toastMessage}</div>}
       <CardFooter>
         <Button onClick={handleSubmit}>Login</Button>
         <Button className="mx-10" onClick={handleSignUp}>New Here? SignUp</Button>
