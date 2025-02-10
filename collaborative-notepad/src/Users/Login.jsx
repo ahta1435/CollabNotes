@@ -30,13 +30,13 @@ function Login({}) {
     setEmail(val);
   }
 
-  // useEffect(() => {
-  //   if (showToast) {
-  //     setTimeout(()=>{
-  //       setShowToast(false)
-  //     },2500);
-  //   }
-  // },[showToast]);
+  useEffect(() => {
+    if (showToast) {
+      setTimeout(()=>{
+        setShowToast(false)
+      },2500);
+    }
+  },[showToast]);
   
   const {from}  = location.state || { from: { pathname: "/dashboard" } }; 
   const handlePasswordChange = (e) => {
@@ -98,6 +98,7 @@ function Login({}) {
 
   return (
     <Card className="w-250 h-250 items-center justify-center flex-row">
+      {showLoader && <Loader/>}
       <CardHeader>
         <CardTitle>Welcome To Collaborative Note App</CardTitle>
       </CardHeader>
@@ -107,7 +108,7 @@ function Login({}) {
         <Label htmlFor="password">Password</Label>
         <Input type="password" id="password" placeholder="password" onChange={handlePasswordChange}/>
       </CardContent>
-        {showToast && <div className='p-6 text-red-500'>{toastMessage}</div>}
+      {showToast && <div className='p-6 text-red-500'>{toastMessage}</div>}
       <CardFooter>
         <Button onClick={handleSubmit}>Login</Button>
         <Button className="mx-10" onClick={handleSignUp}>New Here? SignUp</Button>
