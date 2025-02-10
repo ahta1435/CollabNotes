@@ -62,12 +62,16 @@ function Login({}) {
           },
           body : JSON.stringify(dataObj)
         })
-        const data = await res.json();
-        const sessionId = data?.sessionId;
-        localStorage.setItem("user",JSON.stringify(data));
-        setShowLoader(false);
-        if (sessionId) {
-          history.replace(from);
+        try {
+          const data = await res.json();
+          const sessionId = data?.sessionId;
+          localStorage.setItem("user",JSON.stringify(data));
+          if (sessionId) {
+            history.replace(from);
+          }
+          setShowLoader(false);
+        } catch(error) {
+          setShowLoader(false);
         }
       } catch (e) {
         console.log(e)
