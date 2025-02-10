@@ -9,8 +9,8 @@ const server = http.createServer(app);
 
 const io = require('socket.io')(server,{
     cors : {
-        origin: [`https://collab-notes-frontend-iota.vercel.app`, `${process.env.MONGODB_URI}`],
-        methods: ["GET", "POST"],
+      origin: [`https://collab-notes-frontend-iota.vercel.app`],
+      methods: ["GET", "POST"],
     }
 });
 
@@ -22,6 +22,7 @@ server.listen(port, () => {
 
 
 io.on("connection", socket => {
+  console.log("============connected---------");
   socket.on("get-document", async (documentId,userId,title) => {
     const document = await findOrCreateDocument(documentId,userId,title);
     console.log("---------Logged documentId-----------", documentId);
