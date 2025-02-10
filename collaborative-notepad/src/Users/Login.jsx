@@ -32,7 +32,7 @@ function Login({}) {
     if (showToast) {
       setTimeout(()=>{
         setShowToast(false)
-      },2500);
+      },25000);
     }
   },[showToast]);
   
