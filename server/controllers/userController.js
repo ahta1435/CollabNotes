@@ -23,7 +23,8 @@ function validateUserInput(dataObj) {
     return true;
 }
 
-router.post('/signup',async (req, res) => {    
+router.post('/signup',async (req, res) => {   
+  try {
     const { email, firstName, lastName, groups = "", password } = req.body;
     const userObj = {
       email : email,
@@ -41,6 +42,10 @@ router.post('/signup',async (req, res) => {
 
     await User.create(userObj); 
     return res.status(200).json({message: "Successfully Created User"});
+  } catch(err) {
+    return res.status(500).json({message: err});
+  }
+    
 });
 
 router.post("/signIn",async (req,res) => {
@@ -72,7 +77,7 @@ router.post("/getUsers", async (req,res) => {
     const user = await User.find({_id : {$in : userIds}});
     return res.status(200).json({data : user});
   } catch (err) {
-
+    return res.status(500).json({message : err});
   }
 })
 
