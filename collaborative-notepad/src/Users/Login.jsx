@@ -70,7 +70,7 @@ function Login({}) {
             history.replace(from);
           } else {
             setShowToast(true);
-            setToastMessage(error);
+            setToastMessage(data.message);
           }
           setShowLoader(false);
         } catch(error) {
