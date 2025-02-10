@@ -43,7 +43,7 @@ function SignUp() {
     setLastName(val);
   }
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (email && password && firstName) {
       try {
           const dataObj = {
@@ -52,20 +52,20 @@ function SignUp() {
               firstName : firstName,
               lastName: lastName || ""
           };
-          fetch(`https://collab-notes-khaki.vercel.app/user/signup`,{
+          const res = await fetch(`https://collab-notes-khaki.vercel.app/user/signup`,{
             method : "POST",
             mode: 'no-cors',
             headers : {
               'Content-type' : "application/json"
             },
             body : JSON.stringify(dataObj)
-          }).then(res => res.json())
-          .then(data =>{
-            const state = history.location.state || {};
-            history.push("/login",state);
-          });
+          })
+          const data = await res.json();
+          const state = history.location.state || {};
+          history.push("/login",state);
+
       } catch (e) {
-          
+          console.log(e);
       }
     }
   }

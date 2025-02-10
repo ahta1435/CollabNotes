@@ -33,30 +33,29 @@ function Login({}) {
     history.push("/signup",state);
   }
 
-  const handleSubmit = () => {
+  const handleSubmit =async () => {
     if (email && password) {
       try {
         const dataObj = {
           email : email,
           password: password
         };
-        fetch(`https://collab-notes-khaki.vercel.app/user/signIn`,{
+        const res = await fetch(`https://collab-notes-khaki.vercel.app/user/signIn`,{
           method : "POST",
           mode: 'no-cors',
           headers : {
               'Content-type' : "application/json"
           },
           body : JSON.stringify(dataObj)
-        }).then(res => res.json())
-        .then(data =>{
-          const sessionId = data?.sessionId;
-          localStorage.setItem("user",JSON.stringify(data));
-          if (sessionId) {
-            history.replace(from);
-          }
-        });
+        })
+        const data = await data.json();
+        const sessionId = data?.sessionId;
+        localStorage.setItem("user",JSON.stringify(data));
+        if (sessionId) {
+          history.replace(from);
+        }
       } catch (e) {
-          
+        console.log(e)
       }
     }
   }
