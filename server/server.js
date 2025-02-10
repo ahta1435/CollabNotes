@@ -24,9 +24,11 @@ server.listen(port, () => {
 io.on("connection", socket => {
   socket.on("get-document", async (documentId,userId,title) => {
     const document = await findOrCreateDocument(documentId,userId,title);
+    console.log("---------Logged documentId-----------", documentId);
     if (!document) {
         return;
     }
+    console.log("---------User Id-----------", userId);
     socket.join(documentId)
     socket.emit("load-document", document.noteBook);
 
