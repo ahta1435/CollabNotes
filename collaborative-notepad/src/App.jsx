@@ -32,7 +32,7 @@ function App() {
                getUser() && !getPath() ? <Redirect to="/login" /> : <UserDashboard {...props} />
               }
             /> */}
-            {/* <Route path="/dashboard/notes/:id" component={UserDashboard} /> */}
+            <Route path="/dashboard/notes/:id" component={UserDashboard} />
             {getUser() && <Route path="/signup" component={SignUp}/>}
             {getUser() && <Redirect from="/" to="/login" />}
           </Switch>
