@@ -14,6 +14,7 @@ const io = require('socket.io')(server,{
     }
 });
 
+server.listen();
 // server.listen(port, () => {
 //     const address = server.address();
     
