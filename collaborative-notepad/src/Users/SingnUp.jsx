@@ -1,7 +1,8 @@
-import React , {useState} from 'react';
+import React , {useEffect, useState} from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from "../components/ui/input";
 import { useHistory } from 'react-router-dom';
+import { Toaster } from "@/components/ui/toaster"
 import {
   Card,
   CardContent,
@@ -15,11 +16,21 @@ import Loader from '../Loader/Loader';
 function SignUp() {
   const [email,setEmail] = useState("");
   const [showLoader,setShowLoader] = useState(false);
+  const [showToast,setShowToast] = useState(false);
   const [password,setPassword] = useState("");
+  const [toastMessage,setToastMessage] = useState("");
   const [firstName,setFirstName] = useState("");
   const [lastName,setLastName] = useState("");
-   const history = useHistory();
+  const history = useHistory();
 
+
+  useEffect(() => {
+    if (showToast) {
+      setTimeout(()=>{
+        setShowToast(false)
+      },2500);
+    }
+  },[showToast]);
 
   const handleEmailChange = (e) => {
     const val = e.target.value;
@@ -66,9 +77,10 @@ function SignUp() {
           const state = history.location.state || {};
           setShowLoader(false);
           history.push("/login",state);
-
       } catch (e) {
           console.log(e);
+          setShowToast(true);
+          setToastMessage(e);
           setShowLoader(false)
       }
     }
@@ -77,6 +89,7 @@ function SignUp() {
   return (  
     <Card className="w-200 h-250 items-center justify-center flex-row">
       {showLoader && <Loader/>}
+      {showToast && <Toaster description={toastMessage}/>}
       <CardHeader>
         <CardTitle>Welcome To Collaborative Note App</CardTitle>
       </CardHeader>

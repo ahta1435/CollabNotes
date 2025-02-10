@@ -2,6 +2,7 @@ import React , {useState,useContext} from 'react';
 import { Button } from '../components/ui/button';
 import { Input } from "../components/ui/input";
 import { useHistory,useLocation } from 'react-router-dom';
+import { Toaster } from "@/components/ui/toaster"
 import {
   Card,
   CardContent,
@@ -19,12 +20,22 @@ function Login({}) {
   const [showLoader,setShowLoader] = useState(false);
   const location = useLocation();
   const [password,setPassword] = useState("");
+  const [showToast,setShowToast] = useState(false);
+  const [toastMessage,setToastMessage] = useState("");
   const history = useHistory();
   const handleEmailChange = (e) => {
     const val = e.target.value;
     setEmail(val);
   }
 
+  useEffect(() => {
+    if (showToast) {
+      setTimeout(()=>{
+        setShowToast(false)
+      },2500);
+    }
+  },[showToast]);
+  
   const {from}  = location.state || { from: { pathname: "/dashboard" } }; 
   const handlePasswordChange = (e) => {
     const val = e.target.value;
@@ -60,6 +71,8 @@ function Login({}) {
         }
       } catch (e) {
         console.log(e)
+        setShowToast(true);
+        setToastMessage(e);
         setShowLoader(false);
       }
     }
@@ -68,6 +81,7 @@ function Login({}) {
   return (
     <Card className="w-250 h-250 items-center justify-center flex-row">
       {showLoader && <Loader/>}
+      {showToast && <Toaster description={toastMessage}/>}
       <CardHeader>
         <CardTitle>Welcome To Collaborative Note App</CardTitle>
       </CardHeader>
