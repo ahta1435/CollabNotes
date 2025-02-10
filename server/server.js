@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 const io = require('socket.io')(server,{
     cors : {
-        origin: `${process.env.MONGODB_URI}`,
+        origin: `https://collab-notes-frontend-iota.vercel.app`,
         methods: ["GET", "POST"],
     }
 });
