@@ -37,7 +37,7 @@ io.on("connection", socket => {
       socket.broadcast.to(documentId).emit("receive-changes", delta)
     });
     socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
-      if (userId !== loggedInUserId) {
+      if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
         const olderNoteBook = await NoteBook.findById(docId);
         const updatedNoteBook = await NoteBook.findByIdAndUpdate(
             docId,
