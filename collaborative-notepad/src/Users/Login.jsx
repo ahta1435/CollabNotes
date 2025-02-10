@@ -98,7 +98,6 @@ function Login({}) {
 
   return (
     <Card className="w-250 h-250 items-center justify-center flex-row">
-      {showLoader && <Loader/>}
       <CardHeader>
         <CardTitle>Welcome To Collaborative Note App</CardTitle>
       </CardHeader>
@@ -107,9 +106,10 @@ function Login({}) {
         <Input type="email" id="email" placeholder="email" onChange={handleEmailChange}/>
         <Label htmlFor="password">Password</Label>
         <Input type="password" id="password" placeholder="password" onChange={handlePasswordChange}/>
+        {showToast && <div className='decoration-red-700'>{toastMessage}</div>}
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSubmit} {...getToast()} >Login</Button>
+        <Button onClick={handleSubmit}>Login</Button>
         <Button className="mx-10" onClick={handleSignUp}>New Here? SignUp</Button>
       </CardFooter>
     </Card>
