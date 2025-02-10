@@ -3,7 +3,7 @@ const app = require('./App');
 const NoteBook = require('./Schemas/notesSchema');
 require('dotenv').config();
 //port at which the project shld run
-// const port = process.env.port || 8000;
+const port = process.env.port || 8000;
 
 const server = http.createServer(app);
 
@@ -14,7 +14,7 @@ const io = require('socket.io')(server,{
     }
 });
 
-server.listen();
+server.listen(port);
 io.on("connection", socket => {
   console.log("============connected---------");
   socket.on("get-document", async (documentId,userId,title) => {
