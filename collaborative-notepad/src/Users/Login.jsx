@@ -3,6 +3,7 @@ import { Button } from '../components/ui/button';
 import { Input } from "../components/ui/input";
 import { useHistory,useLocation } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster"
+import { useToast } from '@/hooks/use-toast';
 import {
   Card,
   CardContent,
@@ -23,6 +24,7 @@ function Login({}) {
   const [showToast,setShowToast] = useState(false);
   const [toastMessage,setToastMessage] = useState("");
   const history = useHistory();
+  const {toast} = useToast();
   const handleEmailChange = (e) => {
     const val = e.target.value;
     setEmail(val);
@@ -32,7 +34,7 @@ function Login({}) {
     if (showToast) {
       setTimeout(()=>{
         setShowToast(false)
-      },25000);
+      },2500);
     }
   },[showToast]);
   
@@ -71,6 +73,7 @@ function Login({}) {
           } else {
             setShowToast(true);
             setToastMessage(data.message);
+            console.log(data.message);
           }
           setShowLoader(false);
         } catch(error) {
@@ -85,10 +88,17 @@ function Login({}) {
     }
   }
 
+  const getToast = () => {
+    if (showToast) {
+      return (toast({
+        description: toastMessage
+      }))
+    }
+  }
+
   return (
     <Card className="w-250 h-250 items-center justify-center flex-row">
       {showLoader && <Loader/>}
-      {showToast && <Toaster description={toastMessage}/>}
       <CardHeader>
         <CardTitle>Welcome To Collaborative Note App</CardTitle>
       </CardHeader>
@@ -99,7 +109,7 @@ function Login({}) {
         <Input type="password" id="password" placeholder="password" onChange={handlePasswordChange}/>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSubmit}>Login</Button>
+        <Button onClick={handleSubmit} {...getToast()} >Login</Button>
         <Button className="mx-10" onClick={handleSignUp}>New Here? SignUp</Button>
       </CardFooter>
     </Card>
