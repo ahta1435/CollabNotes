@@ -31,5 +31,8 @@ app.use('/user',user);
 app.use("/notebook",note);
 app.use("/mail",email);
 
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello from Vercel!' });
+});
 
 module.exports = app;
