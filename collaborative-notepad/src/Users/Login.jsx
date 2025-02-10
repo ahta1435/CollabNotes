@@ -40,7 +40,7 @@ function Login({}) {
           email : email,
           password: password
         };
-        fetch(`https://collab-notes-5lcc.vercel.app/api/user/signIn`,{
+        fetch(`https://collab-notes-khaki.vercel.app/user/signIn`,{
           method : "POST",
           mode: 'no-cors',
           headers : {
