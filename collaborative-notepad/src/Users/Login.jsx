@@ -40,7 +40,7 @@ function Login({}) {
           email : email,
           password: password
         };
-        const res = await fetch(`https://collab-notes-khaki.vercel.app/user/signIn`,{
+        const res = await fetch(`https://collabnotes-uj7x.onrender.com/user/signIn`,{
           method : "POST",
           headers : {
               'Content-type' : "application/json"

@@ -41,7 +41,7 @@ export function NavMain({
       notesId : currLoc[2]
     };
     const contributorQuery = new URLSearchParams(contributorPrams).toString();
-    const getContributors = await fetch(`https://collab-notes-khaki.vercel.app/notebook/contributors/${contributorQuery}`);
+    const getContributors = await fetch(`https://collabnotes-uj7x.onrender.com/notebook/contributors/${contributorQuery}`);
     const response = await getContributors.json();
     setContributors(response.contributors[0]?.contributers || []);
     setTitleName(currLoc[4]);

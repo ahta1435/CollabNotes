@@ -29,7 +29,7 @@ export default function TextEditor({setContributors}) {
   },[documentId]);
   
   useEffect(() => {
-    const s = io("https://collab-notes-khaki.vercel.app")
+    const s = io("https://collabnotes-uj7x.onrender.com")
     setSocket(s)
 
     return () => {

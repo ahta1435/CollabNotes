@@ -52,7 +52,7 @@ function SignUp() {
               firstName : firstName,
               lastName: lastName || ""
           };
-          const res = await fetch(`https://collab-notes-khaki.vercel.app/user/signup`,{
+          const res = await fetch(`https://collabnotes-uj7x.onrender.com/user/signup`,{
             method : "POST",
             headers : {
               'Content-type' : "application/json"
