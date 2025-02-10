@@ -3,7 +3,7 @@ const app = require('./App');
 const NoteBook = require('./Schemas/notesSchema');
 require('dotenv').config();
 //port at which the project shld run
-const port = process.env.port || 8000;
+// const port = process.env.port || 8000;
 
 const server = http.createServer(app);
 
@@ -14,11 +14,11 @@ const io = require('socket.io')(server,{
     }
 });
 
-server.listen(port, () => {
-    const address = server.address();
+// server.listen(port, () => {
+//     const address = server.address();
     
-    console.log(`Server running at http://${address.address}:${address.port}/`);
-});
+//     console.log(`Server running at http://${address.address}:${address.port}/`);
+// });
 
 
 io.on("connection", socket => {
