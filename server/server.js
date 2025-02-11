@@ -28,7 +28,7 @@ io.on("connection", socket => {
         if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
           const olderNoteBook = await NoteBook.findById(documentId);
           const updatedNoteBook = await NoteBook.findByIdAndUpdate(
-              docId,
+            documentId,
               { $addToSet: { contributers: loggedInUserId } },
               { new: true }
           );
