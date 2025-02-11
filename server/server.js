@@ -18,12 +18,6 @@ server.listen(port);
 io.on("connection", socket => {
   socket.on("get-document", async (documentId,userId,title,loggedInUserId) => {
     try {
-      if (loggedInUserId != userId) {
-        const olderNoteBook = await NoteBook.findById(docId);
-        if (!olderNoteBook) {
-          socket.broadcast.to(documentId).emit("document-deleted", {showDeleteDialog:true});
-        }
-      }
       const document = await findOrCreateDocument(documentId,userId,title);
       if (!document) {
           return;
@@ -37,10 +31,6 @@ io.on("connection", socket => {
       socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
         if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
           const olderNoteBook = await NoteBook.findById(docId);
-          if (!olderNoteBook) {
-            console.log("older-docs",olderNoteBook);
-            socket.broadcast.to(documentId).emit("document-deleted", {showDeleteDialog:true});
-          }
           const updatedNoteBook = await NoteBook.findByIdAndUpdate(
               docId,
               { $addToSet: { contributers: loggedInUserId } },
