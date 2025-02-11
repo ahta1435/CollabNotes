@@ -24,19 +24,6 @@ io.on("connection", socket => {
       }
       socket.join(documentId)
       socket.emit("load-document", document.noteBook);
-      socket.on("update-contributor",async (documentId,userId,loggedInUserId) => {
-        if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
-          const olderNoteBook = await NoteBook.findById(documentId);
-          const updatedNoteBook = await NoteBook.findByIdAndUpdate(
-            documentId,
-              { $addToSet: { contributers: loggedInUserId } },
-              { new: true }
-          );
-          if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
-            io.emit("contributors-updated", updatedNoteBook?.contributers);
-          }
-        }
-      });
       socket.on("send-changes", delta => {
         socket.broadcast.to(documentId).emit("receive-changes", delta)
       });
@@ -46,14 +33,14 @@ io.on("connection", socket => {
           if (!olderNoteBook) {
             io.emit("refresh", ()=>{});
           }
-          // const updatedNoteBook = await NoteBook.findByIdAndUpdate(
-          //     docId,
-          //     { $addToSet: { contributers: loggedInUserId } },
-          //     { new: true }
-          // );
-          // if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
-          //   io.emit("contributors-updated", updatedNoteBook?.contributers);
-          // }
+          const updatedNoteBook = await NoteBook.findByIdAndUpdate(
+              docId,
+              { $addToSet: { contributers: loggedInUserId } },
+              { new: true }
+          );
+          if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
+            io.emit("contributors-updated", updatedNoteBook?.contributers);
+          }
         }
         await NoteBook.findByIdAndUpdate(docId, {$set: {noteBook}});
       })
@@ -67,7 +54,6 @@ io.on("connection", socket => {
 async function findOrCreateDocument(id,userId,title,loggedInUserId) {
   try {
     if (id == null) return
-    console.log("+++++Logging ID++++",id);
     const document = await NoteBook.findById(id);
     if (document) return  document;
     const createObj = {
