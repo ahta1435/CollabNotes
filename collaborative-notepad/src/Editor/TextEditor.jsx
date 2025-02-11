@@ -18,6 +18,7 @@ const TOOLBAR_OPTIONS = [
 
 export default function TextEditor({setContributors,setShowDocumentDeleted}) {
   const {id :documentId,userId,title,isShare} = useParams();
+  const history = useHistory();
   const loggedInUserId = JSON.parse(localStorage.getItem("user"))?.userData?._id;
   const ref = useRef(null);
   const [socket, setSocket] = useState()
@@ -49,13 +50,12 @@ export default function TextEditor({setContributors,setShowDocumentDeleted}) {
 
   useEffect(() => {
     if (socket == null) return
-    socket.on('document-deleted', ({}) => {
-      setShowDocumentDeleted(true);
-      console.log("emit-happening");
+    socket.on('refresh', () => {
+      console.log("called");
+      history.push("/dashboard");
     });
     return () => {
-      socket.off('document-deleted');
-      setShowDocumentDeleted(false);
+      socket.off('refresh');
     };
   }, [socket]);
 
