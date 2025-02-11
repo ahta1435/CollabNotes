@@ -48,8 +48,8 @@ export default function TextEditor({setContributors,setShowDocumentDeleted}) {
   }, [socket]);
 
   useEffect(() => {
-    if (socket == null || quill == null) return
-    socket.on('document-deleted', () => {
+    if (socket == null) return
+    socket.on('document-deleted', ({}) => {
       setShowDocumentDeleted(true);
       console.log("emit-happening");
     });
@@ -62,7 +62,7 @@ export default function TextEditor({setContributors,setShowDocumentDeleted}) {
   // first time loading the document
   useEffect(() => {
     if (socket == null || quill == null) return
-    socket.emit("get-document", documentId,userId,title);
+    socket.emit("get-document", documentId,userId,title,loggedInUserId);
 
     socket.once("load-document", document => {
       quill.setContents(document);
