@@ -51,6 +51,7 @@ export default function TextEditor({setContributors,setShowDocumentDeleted}) {
     if (socket == null || quill == null) return
     socket.on('document-deleted', () => {
       setShowDocumentDeleted(true);
+      console.log("emit-happening");
     });
     return () => {
       socket.off('document-deleted');

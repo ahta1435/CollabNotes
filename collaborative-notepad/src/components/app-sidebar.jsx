@@ -55,7 +55,8 @@ function prepareData(notes,sharedNoteBooks) {
     })
     navMain.push({...obj, items});
   });
-  data["navMain"] = navMain
+  data["navMain"] = navMain;
+  console.log("shared-data-log::  ",data);
   return data;
 }
 

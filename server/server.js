@@ -31,6 +31,7 @@ io.on("connection", socket => {
       socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
         if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
           const olderNoteBook = await NoteBook.findById(docId);
+          console.log("older-docs",olderNoteBook);
           if (!olderNoteBook) {
             socket.broadcast.to(docId).emit("document-deleted");
           }
