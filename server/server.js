@@ -59,12 +59,12 @@ async function findOrCreateDocument(id,userId,title,loggedInUserId) {
     const document = await NoteBook.findById(id);
     if (document) {
       if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
-        const olderNoteBook = await NoteBook.findById(docId);
+        const olderNoteBook = await NoteBook.findById(id);
         if (!olderNoteBook) {
           io.emit("refresh", ()=>{});
         }
         const updatedNoteBook = await NoteBook.findByIdAndUpdate(
-            docId,
+            id,
             { $addToSet: { contributers: loggedInUserId } },
             { new: true }
         );
