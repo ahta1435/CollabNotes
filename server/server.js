@@ -33,7 +33,7 @@ io.on("connection", socket => {
           const olderNoteBook = await NoteBook.findById(docId);
           console.log("older-docs",olderNoteBook);
           if (!olderNoteBook) {
-            socket.broadcast.to(docId).emit("document-deleted");
+            io.emit("document-deleted");
           }
           const updatedNoteBook = await NoteBook.findByIdAndUpdate(
               docId,
