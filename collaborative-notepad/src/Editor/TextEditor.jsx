@@ -116,14 +116,8 @@ export default function TextEditor({setContributors,setLoadOnShareDeletion}) {
 
     const handler = (delta, oldDelta, source) => {
       if (source !== "user") return
-      const plainTextDelta = delta.ops.map(op => {
-        return {
-          ...op,
-          // removing the extra arrtibutes
-          attributes: {}
-        };
-      });
-      socket.emit("send-changes", plainTextDelta)
+  
+      socket.emit("send-changes", delta)
     }
     quill.on("text-change", handler)
 
