@@ -95,7 +95,14 @@ export default function TextEditor({setContributors,setLoadOnShareDeletion}) {
     if (socket == null || quill == null) return
 
     const handler = delta => {
-      quill.updateContents(delta)
+      const plainTextDelta = delta.ops.map(op => {
+        return {
+          ...op,
+          // removing the extra arrtibutes
+          attributes: {}
+        };
+      });
+      quill.updateContents(plainTextDelta)
     }
     socket.on("receive-changes", handler)
 
@@ -109,7 +116,14 @@ export default function TextEditor({setContributors,setLoadOnShareDeletion}) {
 
     const handler = (delta, oldDelta, source) => {
       if (source !== "user") return
-      socket.emit("send-changes", delta)
+      const plainTextDelta = delta.ops.map(op => {
+        return {
+          ...op,
+          // removing the extra arrtibutes
+          attributes: {}
+        };
+      });
+      socket.emit("send-changes", plainTextDelta)
     }
     quill.on("text-change", handler)
 
