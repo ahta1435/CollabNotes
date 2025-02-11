@@ -24,25 +24,37 @@ io.on("connection", socket => {
       }
       socket.join(documentId)
       socket.emit("load-document", document.noteBook);
-    
+      socket.on("update-contributor",async (documentId,userId,loggedInUserId) => {
+        if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
+          const olderNoteBook = await NoteBook.findById(documentId);
+          const updatedNoteBook = await NoteBook.findByIdAndUpdate(
+              docId,
+              { $addToSet: { contributers: loggedInUserId } },
+              { new: true }
+          );
+          if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
+            io.emit("contributors-updated", updatedNoteBook?.contributers);
+          }
+        }
+      });
       socket.on("send-changes", delta => {
         socket.broadcast.to(documentId).emit("receive-changes", delta)
       });
       socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
-        // if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
-        //   const olderNoteBook = await NoteBook.findById(docId);
-        //   if (!olderNoteBook) {
-        //     socket.broadcast.to(docId).emit("refresh", ()=>{});
-        //   }
-        //   const updatedNoteBook = await NoteBook.findByIdAndUpdate(
-        //       docId,
-        //       { $addToSet: { contributers: loggedInUserId } },
-        //       { new: true }
-        //   );
-        //   if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
-        //     io.emit("contributors-updated", updatedNoteBook?.contributers);
-        //   }
-        // }
+        if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
+          const olderNoteBook = await NoteBook.findById(docId);
+          if (!olderNoteBook) {
+            io.emit("refresh", ()=>{});
+          }
+          // const updatedNoteBook = await NoteBook.findByIdAndUpdate(
+          //     docId,
+          //     { $addToSet: { contributers: loggedInUserId } },
+          //     { new: true }
+          // );
+          // if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
+          //   io.emit("contributors-updated", updatedNoteBook?.contributers);
+          // }
+        }
         await NoteBook.findByIdAndUpdate(docId, {$set: {noteBook}});
       })
     } catch(error) {
@@ -57,22 +69,6 @@ async function findOrCreateDocument(id,userId,title,loggedInUserId) {
     if (id == null) return
     console.log("+++++Logging ID++++",id);
     const document = await NoteBook.findById(id);
-    if (document) {
-      if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
-        const olderNoteBook = await NoteBook.findById(id);
-        if (!olderNoteBook) {
-          io.emit("refresh", ()=>{});
-        }
-        const updatedNoteBook = await NoteBook.findByIdAndUpdate(
-            id,
-            { $addToSet: { contributers: loggedInUserId } },
-            { new: true }
-        );
-        if ((olderNoteBook && updatedNoteBook) && olderNoteBook.contributers.length != updatedNoteBook?.contributers.length) {
-          io.emit("contributors-updated", updatedNoteBook?.contributers);
-        }
-      }
-    }
     if (document) return  document;
     const createObj = {
       title: title,

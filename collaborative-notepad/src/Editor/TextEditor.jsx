@@ -67,8 +67,14 @@ export default function TextEditor({setContributors,setLoadOnShareDeletion}) {
 
     socket.once("load-document", document => {
       quill.setContents(document);
-      quill.enable()
+      quill.enable();
+      socket.emit("update-contributor",documentId,userId,title,loggedInUserId);
+      setLoadOnShareDeletion(true);
     });
+
+    return () => {
+
+    }
   }, [socket, quill, documentId,title]);
 
   useEffect(() => {
