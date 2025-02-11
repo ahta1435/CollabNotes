@@ -16,7 +16,7 @@ const TOOLBAR_OPTIONS = [
   [{ align: [] }],
 ]
 
-export default function TextEditor({setContributors,setShowDocumentDeleted}) {
+export default function TextEditor({setContributors,setLoadOnShareDeletion}) {
   const {id :documentId,userId,title,isShare} = useParams();
   const history = useHistory();
   const loggedInUserId = JSON.parse(localStorage.getItem("user"))?.userData?._id;
