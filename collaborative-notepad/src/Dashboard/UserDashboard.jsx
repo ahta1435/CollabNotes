@@ -36,6 +36,7 @@ import Loader from "../Loader/Loader";
 function UserDashboard() {
   const [userNotes,setUserNotes] = useState([]);
   const history = useHistory();
+  const [showDocumentDeleted,setShowDocumentDeleted] = useState(false);
   const [selectedId,setSelectedNoteBook] = useState("");
   const [titleName,setTitleName] = useState("");
   const [contributors,setContributors] = useState([]);
@@ -112,7 +113,7 @@ function UserDashboard() {
     <SidebarProvider>
       {showLoader && <Loader/>}
       <AppSidebar userNotes={userNotes} setUserNotes={setUserNotes} setSelectedNoteBook={setSelectedNoteBook} setTitleName={setTitleName} key={userNotes.length} setContributors={setContributors} setSharedNoteBooks={setSharedNoteBooks} sharedNoteBooks={sharedNoteBooks} selectedId={selectedId} setShowLoader={setShowLoader}/>
-     <SidebarInset>
+      <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
@@ -150,13 +151,14 @@ function UserDashboard() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Switch>
             <Route path="/dashboard/notes/:id/:userId?/:title?/:isShare?">
-              <TextEditor setContributors={setContributors}/>
+              <TextEditor setContributors={setContributors} setShowDocumentDeleted={setShowDocumentDeleted}/>
             </Route>
             <Route path="/dashboard/notes" >
               <Redirect to={`/dashboard/notes/${selectedId}/${userData?._id}/${titleName}`} />
             </Route>
           </Switch>
         </div>
+        {showDocumentDeleted && <DialogCloseButton inviteContributor/>}
       </SidebarInset>
     </SidebarProvider>
   )

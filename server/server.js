@@ -16,15 +16,12 @@ const io = require('socket.io')(server,{
 
 server.listen(port);
 io.on("connection", socket => {
-  console.log("============connected---------");
   socket.on("get-document", async (documentId,userId,title) => {
     try {
       const document = await findOrCreateDocument(documentId,userId,title);
-      console.log("---------Logged documentId-----------", documentId);
       if (!document) {
           return;
       }
-      console.log("---------User Id-----------", userId);
       socket.join(documentId)
       socket.emit("load-document", document.noteBook);
   
@@ -34,6 +31,9 @@ io.on("connection", socket => {
       socket.on("save-document", async (noteBook,docId,loggedInUserId,userId) => {
         if (loggedInUserId  && userId && (userId !== loggedInUserId)) {
           const olderNoteBook = await NoteBook.findById(docId);
+          if (!olderNoteBook) {
+            socket.broadcast.to(docId).emit("document-deleted");
+          }
           const updatedNoteBook = await NoteBook.findByIdAndUpdate(
               docId,
               { $addToSet: { contributers: loggedInUserId } },

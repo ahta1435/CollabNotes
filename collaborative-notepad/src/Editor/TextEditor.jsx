@@ -16,7 +16,7 @@ const TOOLBAR_OPTIONS = [
   [{ align: [] }],
 ]
 
-export default function TextEditor({setContributors}) {
+export default function TextEditor({setContributors,setShowDocumentDeleted}) {
   const {id :documentId,userId,title,isShare} = useParams();
   const loggedInUserId = JSON.parse(localStorage.getItem("user"))?.userData?._id;
   const ref = useRef(null);
@@ -44,6 +44,17 @@ export default function TextEditor({setContributors}) {
     });
     return () => {
       socket.off('contributors-updated');
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket == null || quill == null) return
+    socket.on('document-deleted', () => {
+      setShowDocumentDeleted(true);
+    });
+    return () => {
+      socket.off('document-deleted');
+      setShowDocumentDeleted(false);
     };
   }, [socket]);
 

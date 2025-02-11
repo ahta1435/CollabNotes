@@ -3,8 +3,8 @@ const nodemailer = require('nodemailer');
 const router = Router();
 
 // Set up email credentials from .env file
-const emailUser = "x";
-const emailPass = "x";
+const emailUser = "ahtashamulhaque50@gmail.com";
+const emailPass = "pbgubqwumjuboesd";
 
 // Create the transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
