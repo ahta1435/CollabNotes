@@ -51,11 +51,12 @@ export default function TextEditor({setContributors,setShowDocumentDeleted}) {
   useEffect(() => {
     if (socket == null) return
     socket.on('refresh', () => {
-      console.log("called");
+      setLoadOnShareDeletion(true);
       history.push("/dashboard");
     });
     return () => {
       socket.off('refresh');
+      setLoadOnShareDeletion(false);
     };
   }, [socket]);
 

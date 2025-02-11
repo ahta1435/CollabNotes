@@ -39,6 +39,7 @@ function UserDashboard() {
   const [showDocumentDeleted,setShowDocumentDeleted] = useState(false);
   const [selectedId,setSelectedNoteBook] = useState("");
   const [titleName,setTitleName] = useState("");
+  const [loadOnShareDeletion,setLoadOnShareDeletion] = useState(false);
   const [contributors,setContributors] = useState([]);
   const [collaborators,setCollaborators] = useState([]);
   const [sharedNoteBooks,setSharedNoteBooks] = useState([]);
@@ -73,6 +74,12 @@ function UserDashboard() {
       setShowLoader(false);
     }
   }
+
+  useEffect(() => {
+    if (loadOnShareDeletion) {
+      fetchData();
+    }
+  },[loadOnShareDeletion]);
 
   useEffect(() => {
     fetchData();
@@ -151,14 +158,13 @@ function UserDashboard() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Switch>
             <Route path="/dashboard/notes/:id/:userId?/:title?/:isShare?">
-              <TextEditor setContributors={setContributors} setShowDocumentDeleted={setShowDocumentDeleted}/>
+              <TextEditor setContributors={setContributors} setShowDocumentDeleted={setShowDocumentDeleted} setLoadOnShareDeletion={setLoadOnShareDeletion}/>
             </Route>
             <Route path="/dashboard/notes" >
               <Redirect to={`/dashboard/notes/${selectedId}/${userData?._id}/${titleName}`} />
             </Route>
           </Switch>
         </div>
-        {showDocumentDeleted && <DialogCloseButton inviteContributor/>}
       </SidebarInset>
     </SidebarProvider>
   )
