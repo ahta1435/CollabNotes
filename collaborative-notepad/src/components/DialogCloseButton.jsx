@@ -48,7 +48,7 @@ export function DialogCloseButton({
 
   const generateDocLink = () => {
     const loc = history.location.pathname.split("/");
-    let defaultValue = `http://localhost:5173/dashboard/notes/${loc[3]}/share`;
+    let defaultValue = `https://collabnotes-uj7x.onrender.com/dashboard/notes/${loc[3]}/share`;
     return defaultValue;
   }
 
