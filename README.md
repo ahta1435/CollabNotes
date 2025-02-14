@@ -28,3 +28,6 @@ cd CollabNotes
 
 # Install the dependencies
 npm install
+
+LIVE LINK :: https://collab-notes-frontend-iota.vercel.app/
+
