@@ -14,6 +14,7 @@ Lets You create and Share Collaborative Notes
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+- LIVE LINK :: https://collab-notes-frontend-iota.vercel.app/
 
 ## Installation
 
@@ -29,5 +30,5 @@ cd CollabNotes
 # Install the dependencies
 npm install
 
-LIVE LINK :: https://collab-notes-frontend-iota.vercel.app/
+
 
