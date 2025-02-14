@@ -10,6 +10,7 @@ Lets You create and Share Collaborative Notes
 - cd /server
 - npm i
 - chage the ports if in your case its not 8000 for backend and 5173 for frontend
+- update the mongodb connection url and start the mongodb server
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
